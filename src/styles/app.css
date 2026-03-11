@@ -164,6 +164,73 @@ a {
   box-shadow: var(--shadow);
 }
 
+.stage-overview {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  padding: 22px 26px 0;
+}
+
+.stage-overview-copy {
+  max-width: 44rem;
+}
+
+.stage-label {
+  margin: 0 0 8px;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.76rem;
+}
+
+.stage-overview-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stage-overview-heading strong {
+  font-size: 1.15rem;
+}
+
+.stage-overview-heading span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.stage-overview-summary {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.stage-scene-indicator {
+  display: grid;
+  gap: 4px;
+  min-width: 160px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(9, 13, 22, 0.64);
+  text-align: right;
+}
+
+.stage-scene-indicator span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.stage-scene-indicator strong {
+  font-size: 1.3rem;
+}
+
 .scene-page {
   width: 100%;
   min-height: calc(100vh - 230px);
@@ -176,7 +243,7 @@ a {
   align-items: center;
   gap: 24px;
   min-height: calc(100vh - 230px);
-  padding: 38px 56px;
+  padding: 24px 56px 38px;
 }
 
 .story-scene-reclaim,
@@ -1094,6 +1161,7 @@ a {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  margin-top: 20px;
 }
 
 .research-card,
@@ -1211,6 +1279,14 @@ a {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .stage-overview {
+    flex-direction: column;
+  }
+
+  .stage-scene-indicator {
+    text-align: left;
+  }
+
   .story-scene {
     grid-template-columns: 1fr;
     align-content: center;
@@ -1241,6 +1317,15 @@ a {
   .scene-page,
   .story-scene {
     min-height: auto;
+  }
+
+  .stage-overview {
+    padding: 18px 18px 0;
+  }
+
+  .stage-scene-indicator {
+    min-width: 0;
+    width: 100%;
   }
 
   .story-scene {

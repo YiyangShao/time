@@ -12,6 +12,18 @@ if (!defaultStory) {
   throw new Error("Story registry is empty.");
 }
 
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  if (target.isContentEditable) {
+    return true;
+  }
+
+  return ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
+}
+
 export function StoryGallery() {
   const [selectedStoryId, setSelectedStoryId] = useState(defaultStory.id);
   const [activeSceneIndex, setActiveSceneIndex] = useState(0);
@@ -33,8 +45,18 @@ export function StoryGallery() {
     throw new Error(`Missing scene at index ${activeSceneIndex} for story ${selectedStory.id}`);
   }
 
+  const selectedStoryIndex = stories.findIndex((story) => story.id === selectedStory.id);
+
+  if (selectedStoryIndex === -1) {
+    throw new Error(`Unable to locate story order for ${selectedStory.id}`);
+  }
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isEditableTarget(event.target)) {
+        return;
+      }
+
       if (event.key === "ArrowRight") {
         setDirection(1);
         setActiveSceneIndex((current) => Math.min(current + 1, selectedStory.scenes.length - 1));
@@ -68,9 +90,10 @@ export function StoryGallery() {
       </header>
 
       <section className="story-selector" aria-label="故事列表">
-        {stories.map((story) => (
+        {stories.map((story, index) => (
           <StoryCard
             key={story.id}
+            index={index}
             story={story}
             isActive={story.id === selectedStory.id}
             onSelect={() => {
@@ -83,6 +106,26 @@ export function StoryGallery() {
       </section>
 
       <section className="gallery-stage">
+        <div className="stage-overview">
+          <div className="stage-overview-copy">
+            <p className="stage-label">
+              第 {selectedStoryIndex + 1} 展 / 共 {stories.length} 展
+            </p>
+            <div className="stage-overview-heading">
+              <strong>{selectedStory.title}</strong>
+              <span>{selectedStory.theme}</span>
+            </div>
+            <p className="stage-overview-summary">{selectedStory.summary}</p>
+          </div>
+          <div className="stage-scene-indicator" aria-label="当前场景">
+            <span>Scene</span>
+            <strong>
+              {activeSceneIndex + 1} / {selectedStory.scenes.length}
+            </strong>
+            <span>{currentScene.title}</span>
+          </div>
+        </div>
+
         <AnimatePresence initial={false} mode="wait" custom={direction}>
           <motion.div
             key={`${selectedStory.id}:${currentScene.id}`}
@@ -137,10 +180,12 @@ export function StoryGallery() {
 }
 
 function StoryCard({
+  index,
   story,
   isActive,
   onSelect,
 }: {
+  index: number;
   story: StoryDefinition;
   isActive: boolean;
   onSelect: () => void;
@@ -152,7 +197,9 @@ function StoryCard({
       onClick={onSelect}
     >
       <div className="story-card-topline">
-        <span>{story.theme}</span>
+        <span>
+          第 {index + 1} 展 · {story.theme}
+        </span>
         <span>{story.status === "live" ? "可体验" : "策展中"}</span>
       </div>
       <strong>{story.title}</strong>
