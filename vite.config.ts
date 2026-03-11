@@ -1,4 +1,3 @@
-import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -7,8 +6,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: fileURLToPath(new URL("./index.html", import.meta.url)),
-        zh: fileURLToPath(new URL("./zh/index.html", import.meta.url)),
+        main: "index.html",
+        zh: "zh/index.html",
       },
     },
   },
