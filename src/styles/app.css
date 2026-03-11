@@ -323,6 +323,10 @@ a {
   z-index: 1;
 }
 
+.depth-panel-3d {
+  transform-style: preserve-3d;
+}
+
 .scene-visual {
   position: relative;
   min-height: 520px;

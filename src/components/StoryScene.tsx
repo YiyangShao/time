@@ -242,18 +242,16 @@ function DepthPanel({
   const interactiveStyle = reducedMotion
     ? style
     : {
-        ...style,
         rotateX,
         rotateY,
         x: shiftX,
         y: shiftY,
         transformPerspective: 1400,
-        transformStyle: "preserve-3d",
       };
 
   return (
     <motion.div
-      className={className}
+      className={[className, !reducedMotion && "depth-panel-3d"].filter(Boolean).join(" ") || undefined}
       style={interactiveStyle}
       onPointerMove={handlePointerMove}
       onPointerLeave={reset}
