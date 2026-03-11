@@ -1,15 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { stories } from "../content/stories";
+import type { Locale } from "../content/types";
+import { getStories } from "../content/stories";
+import { uiCopyByLocale } from "../i18n";
 import { SceneNavigator } from "./SceneNavigator";
 import { StoryScene } from "./StoryScene";
-
-const defaultStory = stories[0];
-
-if (!defaultStory) {
-  throw new Error("Story registry is empty.");
-}
 
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) {
@@ -23,10 +19,29 @@ function isEditableTarget(target: EventTarget | null): boolean {
   return ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
 }
 
-export function StoryGallery() {
+interface StoryGalleryProps {
+  locale: Locale;
+  onLocaleChange: () => void;
+}
+
+export function StoryGallery({ locale, onLocaleChange }: StoryGalleryProps) {
+  const stories = useMemo(() => getStories(locale), [locale]);
+  const copy = uiCopyByLocale[locale];
+  const defaultStory = stories[0];
+
+  if (!defaultStory) {
+    throw new Error(`Story registry is empty for locale ${locale}.`);
+  }
+
   const [selectedStoryId, setSelectedStoryId] = useState(defaultStory.id);
   const [activeSceneIndex, setActiveSceneIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
+
+  useEffect(() => {
+    setSelectedStoryId(defaultStory.id);
+    setActiveSceneIndex(0);
+    setDirection(1);
+  }, [defaultStory.id, locale]);
 
   const selectedStory = useMemo(() => {
     const story = stories.find((entry) => entry.id === selectedStoryId);
@@ -82,10 +97,13 @@ export function StoryGallery() {
     <div className="gallery-shell">
       <header className="gallery-header">
         <div>
-          <p className="gallery-kicker">interactive story gallery</p>
-          <h1>把时间拿回来</h1>
-          <p className="gallery-intro">五个关于时间去向的互动故事。</p>
+          <p className="gallery-kicker">{copy.galleryKicker}</p>
+          <h1>{copy.title}</h1>
+          <p className="gallery-intro">{copy.intro}</p>
         </div>
+        <button className="language-switch" type="button" onClick={onLocaleChange}>
+          {copy.languageSwitchLabel}
+        </button>
       </header>
 
       <section className="gallery-stage">
@@ -104,6 +122,7 @@ export function StoryGallery() {
                 <StoryScene
                   key={`${selectedStory.id}:${scene.id}`}
                   storyId={selectedStory.id}
+                  locale={locale}
                   scene={scene}
                   nextStoryTitle={nextStory.title}
                   onNextStory={
@@ -146,10 +165,14 @@ export function StoryGallery() {
             setDirection(index >= activeSceneIndex ? 1 : -1);
             setActiveSceneIndex(index);
           }}
+          previousLabel={copy.previousSceneLabel}
+          nextLabel={copy.nextSceneLabel}
+          progressLabel={copy.storyProgressLabel}
+          getJumpLabel={copy.jumpToSceneLabel}
         />
       </section>
 
-      <section className="exhibit-navigator" aria-label="展馆切换">
+      <section className="exhibit-navigator" aria-label={copy.exhibitNavigatorLabel}>
         {stories.map((story) => (
           <button
             key={story.id}

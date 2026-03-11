@@ -4,6 +4,10 @@ interface SceneNavigatorProps {
   onPrevious: () => void;
   onNext: () => void;
   onSelect: (index: number) => void;
+  previousLabel: string;
+  nextLabel: string;
+  progressLabel: string;
+  getJumpLabel: (index: number) => string;
 }
 
 export function SceneNavigator({
@@ -12,6 +16,10 @@ export function SceneNavigator({
   onPrevious,
   onNext,
   onSelect,
+  previousLabel,
+  nextLabel,
+  progressLabel,
+  getJumpLabel,
 }: SceneNavigatorProps) {
   return (
     <>
@@ -20,7 +28,7 @@ export function SceneNavigator({
         type="button"
         onClick={onPrevious}
         disabled={currentIndex === 0}
-        aria-label="上一幕"
+        aria-label={previousLabel}
       >
         <span className="edge-nav-arrow">←</span>
       </button>
@@ -30,19 +38,19 @@ export function SceneNavigator({
         type="button"
         onClick={onNext}
         disabled={currentIndex === totalScenes - 1}
-        aria-label="下一幕"
+        aria-label={nextLabel}
       >
         <span className="edge-nav-arrow">→</span>
       </button>
 
-      <div className="scene-progress" aria-label="故事进度">
+      <div className="scene-progress" aria-label={progressLabel}>
         {Array.from({ length: totalScenes }).map((_, index) => (
           <button
             key={index}
             className={`scene-dot${index === currentIndex ? " is-active" : ""}`}
             type="button"
             onClick={() => onSelect(index)}
-            aria-label={`跳转到第 ${index + 1} 幕`}
+            aria-label={getJumpLabel(index + 1)}
           />
         ))}
       </div>

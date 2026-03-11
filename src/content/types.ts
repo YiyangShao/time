@@ -1,3 +1,5 @@
+export type Locale = "en" | "zh";
+
 export type StoryStatus = "live" | "comingSoon";
 
 export type StorySceneKind =

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 import { getResearchReferences } from "../content/research";
-import type { ReclaimOption, StoryScene as StorySceneData } from "../content/types";
+import type { Locale, ReclaimOption, StoryScene as StorySceneData } from "../content/types";
 import { assertNever } from "../content/types";
+import { uiCopyByLocale } from "../i18n";
 import sceneChoiceImage from "../assets/storyboards/scene-choice-storyboard.jpg";
 import sceneDriftImage from "../assets/storyboards/scene-drift-storyboard.jpg";
 import sceneHomeImage from "../assets/storyboards/scene-home-storyboard.jpg";
@@ -32,6 +33,7 @@ import workSelfReclaimImage from "../assets/storyboards/work-self-reclaim-storyb
 
 interface StorySceneProps {
   storyId: string;
+  locale: Locale;
   scene: StorySceneData;
   onAdvance?: () => void;
   onNextStory?: () => void;
@@ -299,8 +301,16 @@ function HomeOverlay({ storyId }: { storyId: string }) {
   }
 }
 
-export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTitle }: StorySceneProps) {
+export function StoryScene({
+  storyId,
+  locale,
+  scene,
+  onAdvance,
+  onNextStory,
+  nextStoryTitle,
+}: StorySceneProps) {
   const [selectedMinutes, setSelectedMinutes] = useState<15 | 30 | 45>(30);
+  const copy = uiCopyByLocale[locale];
 
   useEffect(() => {
     setSelectedMinutes(30);
@@ -418,7 +428,7 @@ export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTi
               type="button"
               onClick={onAdvance}
             >
-              <span className="click-callout">点击继续</span>
+              <span className="click-callout">{locale === "zh" ? "点击继续" : "Click to continue"}</span>
               {scene.actionLabel}
               <span className="click-pulse click-pulse-cold click-pulse-strong" aria-hidden="true" />
             </button>
@@ -464,7 +474,7 @@ export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTi
     case "reclaim": {
       const nowArtwork = getSceneArtwork(storyId, "loss");
       const futureArtwork = getSceneArtwork(storyId, "reclaim");
-      const references = getResearchReferences(getResearchIds(scene));
+      const references = getResearchReferences(locale, getResearchIds(scene));
 
       if (!selectedOption) {
         throw new Error(`Scene ${scene.id} is missing a reclaim option for ${selectedMinutes} minutes.`);
@@ -486,7 +496,7 @@ export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTi
                 className="scene-backdrop-contained"
                 positionClass={nowArtwork.positionClass}
               />
-              <span className="world-label">现在</span>
+              <span className="world-label">{copy.currentLabel}</span>
               <div className="world-room world-room-cold" />
               <div className="world-glow world-glow-cold" />
             </motion.div>
@@ -497,9 +507,9 @@ export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTi
               transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
             >
               <label className="minutes-label" htmlFor="reclaim-range">
-                <span>拿回</span>
+                <span>{copy.reclaimLabel}</span>
                 <strong>{selectedMinutes}</strong>
-                <span>分钟</span>
+                <span>{copy.minutesLabel}</span>
               </label>
               <input
                 id="reclaim-range"
@@ -551,7 +561,7 @@ export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTi
                 className="scene-backdrop-contained"
                 positionClass={futureArtwork.positionClass}
               />
-              <span className="world-label">拿回后</span>
+              <span className="world-label">{copy.afterLabel}</span>
               <div className="world-room world-room-warm" />
               <div className="world-streams">
                 {Array.from({ length: 10 }).map((_, index) => (
@@ -571,7 +581,7 @@ export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTi
             </motion.div>
           </div>
 
-          <section className="research-panel" aria-label="现实数据">
+          <section className="research-panel" aria-label={copy.dataPanelLabel}>
             {references.map((reference) => (
               <motion.article
                 key={reference.id}
@@ -592,9 +602,9 @@ export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTi
           </section>
 
           {onNextStory && nextStoryTitle ? (
-            <section className="story-end-actions" aria-label="继续看下一个展">
+            <section className="story-end-actions" aria-label={copy.nextExhibitLabel}>
               <button className="story-next-button click-target" type="button" onClick={onNextStory}>
-                下一展：{nextStoryTitle}
+                {copy.nextExhibitLabel}: {nextStoryTitle}
                 <span className="click-pulse click-pulse-warm" aria-hidden="true" />
               </button>
             </section>
@@ -608,7 +618,7 @@ export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTi
         <article className="story-scene story-scene-placeholder">
           <SceneText scene={scene} />
           <div className="placeholder-card">
-            <span className="placeholder-chip">策展中</span>
+            <span className="placeholder-chip">{locale === "zh" ? "策展中" : "curating"}</span>
             <p>{scene.line}</p>
           </div>
         </article>
