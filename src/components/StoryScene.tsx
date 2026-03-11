@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring, type HTMLMotionProps } from "framer-motion";
 
 import { getResearchReferences } from "../content/research";
 import type { Locale, ReclaimOption, StoryScene as StorySceneData } from "../content/types";
@@ -204,6 +204,69 @@ function getRequiredActionLabel(scene: StorySceneData): string {
   return scene.actionLabel;
 }
 
+function DepthPanel({
+  className,
+  children,
+  intensity = 1,
+  style,
+  ...motionProps
+}: HTMLMotionProps<"div"> & { intensity?: number }) {
+  const reducedMotion = useReducedMotion();
+  const rotateX = useSpring(useMotionValue(0), { stiffness: 140, damping: 18, mass: 0.4 });
+  const rotateY = useSpring(useMotionValue(0), { stiffness: 140, damping: 18, mass: 0.4 });
+  const shiftX = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.5 });
+  const shiftY = useSpring(useMotionValue(0), { stiffness: 120, damping: 18, mass: 0.5 });
+
+  const reset = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+    shiftX.set(0);
+    shiftY.set(0);
+  };
+
+  const handlePointerMove: NonNullable<HTMLMotionProps<"div">["onPointerMove"]> = (event) => {
+    if (reducedMotion) {
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+
+    rotateX.set(py * -10 * intensity);
+    rotateY.set(px * 12 * intensity);
+    shiftX.set(px * 8 * intensity);
+    shiftY.set(py * 8 * intensity);
+  };
+
+  const interactiveStyle = reducedMotion
+    ? style
+    : {
+        ...style,
+        rotateX,
+        rotateY,
+        x: shiftX,
+        y: shiftY,
+        transformPerspective: 1400,
+        transformStyle: "preserve-3d",
+      };
+
+  return (
+    <motion.div
+      className={className}
+      style={interactiveStyle}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={reset}
+      onPointerCancel={reset}
+      whileHover={reducedMotion ? undefined : { scale: 1.01 }}
+      transition={{ type: "spring", stiffness: 180, damping: 20 }}
+      {...motionProps}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function HomeOverlay({ storyId }: { storyId: string }) {
   switch (storyId) {
     case "phone-family":
@@ -329,10 +392,11 @@ export function StoryScene({
       return (
         <article className="story-scene story-scene-home">
           <SceneText scene={scene} />
-          <div className="scene-visual home-visual" aria-hidden="true">
+          <DepthPanel className="scene-visual home-visual" aria-hidden="true" intensity={0.9}>
             <SceneBackdrop src={artwork.src} alt="" positionClass={artwork.positionClass} />
+            <div className="scene-depth-haze scene-depth-haze-warm" />
             <HomeOverlay storyId={storyId} />
-          </div>
+          </DepthPanel>
           {scene.actionLabel ? (
             <button className="scene-action click-target" type="button" onClick={onAdvance}>
               {scene.actionLabel}
@@ -351,8 +415,9 @@ export function StoryScene({
       return (
         <article className="story-scene story-scene-choice">
           <SceneText scene={scene} />
-          <div className="scene-visual choice-visual">
+          <DepthPanel className="scene-visual choice-visual" intensity={1.15}>
             <SceneBackdrop src={artwork.src} alt="" positionClass={artwork.positionClass} />
+            <div className="scene-depth-haze scene-depth-haze-cold" />
             <motion.div
               className={choiceClasses.focusClass}
               animate={{ scale: [0.94, 1.08, 0.94], opacity: [0.36, 0.9, 0.36] }}
@@ -383,7 +448,7 @@ export function StoryScene({
               <span className="phone-choice-copy">{choiceLabel}</span>
               <span className="click-pulse click-pulse-cold" aria-hidden="true" />
             </motion.button>
-          </div>
+          </DepthPanel>
         </article>
       );
     }
@@ -394,8 +459,9 @@ export function StoryScene({
       return (
         <article className="story-scene story-scene-drift">
           <SceneText scene={scene} />
-          <div className="scene-visual drift-visual" aria-hidden="true">
+          <DepthPanel className="scene-visual drift-visual" aria-hidden="true" intensity={1.2}>
             <SceneBackdrop src={artwork.src} alt="" positionClass={artwork.positionClass} />
+            <div className="scene-depth-haze scene-depth-haze-cold" />
             <motion.div
               className="drift-vortex"
               animate={{ scale: [0.96, 1.08, 0.96], opacity: [0.85, 1, 0.85] }}
@@ -421,7 +487,7 @@ export function StoryScene({
                 />
               ))}
             </div>
-          </div>
+          </DepthPanel>
           {scene.actionLabel ? (
             <button
               className="scene-action scene-action-prominent scene-action-drift click-target"
@@ -443,8 +509,9 @@ export function StoryScene({
       return (
         <article className="story-scene story-scene-loss">
           <SceneText scene={scene} />
-          <div className="scene-visual loss-visual" aria-hidden="true">
+          <DepthPanel className="scene-visual loss-visual" aria-hidden="true" intensity={1.05}>
             <SceneBackdrop src={artwork.src} alt="" positionClass={artwork.positionClass} />
+            <div className="scene-depth-haze scene-depth-haze-shadow" />
             <div className="loss-dust">
               {Array.from({ length: 8 }).map((_, index) => (
                 <motion.span
@@ -460,7 +527,7 @@ export function StoryScene({
                 />
               ))}
             </div>
-          </div>
+          </DepthPanel>
           {scene.actionLabel ? (
             <button className="scene-action scene-action-ghost click-target" type="button" onClick={onAdvance}>
               {scene.actionLabel}
@@ -484,9 +551,10 @@ export function StoryScene({
         <article className="story-scene story-scene-reclaim">
           <SceneText scene={scene} />
           <div className="reclaim-layout">
-            <motion.div
+            <DepthPanel
               className="world-card world-card-now"
               aria-hidden="true"
+              intensity={0.75}
               animate={{ opacity: [0.82, 1, 0.82] }}
               transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -499,10 +567,11 @@ export function StoryScene({
               <span className="world-label">{copy.currentLabel}</span>
               <div className="world-room world-room-cold" />
               <div className="world-glow world-glow-cold" />
-            </motion.div>
+            </DepthPanel>
 
-            <motion.div
+            <DepthPanel
               className="reclaim-control-card click-target"
+              intensity={0.65}
               animate={{ y: [0, -4, 0] }}
               transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -541,11 +610,12 @@ export function StoryScene({
                   />
                 ))}
               </div>
-            </motion.div>
+            </DepthPanel>
 
-            <motion.div
+            <DepthPanel
               className="world-card world-card-future"
               aria-hidden="true"
+              intensity={0.85}
               animate={{
                 boxShadow: [
                   "0 20px 60px rgba(0, 0, 0, 0.18)",
@@ -578,14 +648,15 @@ export function StoryScene({
                   />
                 ))}
               </div>
-            </motion.div>
+            </DepthPanel>
           </div>
 
           <section className="research-panel" aria-label={copy.dataPanelLabel}>
             {references.map((reference) => (
-              <motion.article
+              <DepthPanel
                 key={reference.id}
                 className="research-card"
+                intensity={0.45}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: 0.08 }}
@@ -597,7 +668,7 @@ export function StoryScene({
                 <a href={reference.url} target="_blank" rel="noreferrer">
                   {reference.source}
                 </a>
-              </motion.article>
+              </DepthPanel>
             ))}
           </section>
 
@@ -640,14 +711,36 @@ function SceneBackdrop({
   className?: string;
   positionClass?: string;
 }) {
+  const reducedMotion = useReducedMotion();
+
   return (
     <motion.img
       className={`scene-backdrop ${className} ${positionClass}`.trim()}
       src={src}
       alt={alt}
-      initial={{ opacity: 0.72, scale: 1.01 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0.72, scale: 1.08, filter: "blur(10px)" }}
+      animate={
+        reducedMotion
+          ? { opacity: 1, scale: 1, filter: "blur(0px)" }
+          : {
+              opacity: 1,
+              scale: [1.04, 1.01, 1.05],
+              x: [0, -10, 0],
+              y: [0, -6, 0],
+              filter: "blur(0px)",
+            }
+      }
+      transition={
+        reducedMotion
+          ? { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+          : {
+              opacity: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+              filter: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+              scale: { duration: 18, repeat: Infinity, ease: "easeInOut" },
+              x: { duration: 18, repeat: Infinity, ease: "easeInOut" },
+              y: { duration: 16, repeat: Infinity, ease: "easeInOut" },
+            }
+      }
     />
   );
 }
@@ -656,13 +749,50 @@ function SceneText({ scene }: { scene: StorySceneData }) {
   return (
     <motion.header
       className="scene-text"
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.08,
+            delayChildren: 0.04,
+          },
+        },
+      }}
     >
-      <p className="scene-kicker">{scene.kicker}</p>
-      <h2>{scene.title}</h2>
-      {scene.line ? <p className="scene-line">{scene.line}</p> : null}
+      <motion.p
+        className="scene-kicker"
+        variants={{
+          hidden: { opacity: 0, y: 18, filter: "blur(8px)" },
+          visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+        }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {scene.kicker}
+      </motion.p>
+      <motion.h2
+        variants={{
+          hidden: { opacity: 0, y: 26, filter: "blur(10px)" },
+          visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+        }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {scene.title}
+      </motion.h2>
+      {scene.line ? (
+        <motion.p
+          className="scene-line"
+          variants={{
+            hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
+            visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+          }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {scene.line}
+        </motion.p>
+      ) : null}
     </motion.header>
   );
 }
