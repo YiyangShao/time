@@ -7,12 +7,38 @@ import { assertNever } from "../content/types";
 import sceneChoiceImage from "../assets/storyboards/scene-choice-storyboard.jpg";
 import sceneDriftImage from "../assets/storyboards/scene-drift-storyboard.jpg";
 import sceneHomeImage from "../assets/storyboards/scene-home-storyboard.jpg";
+import futureSelfChoiceImage from "../assets/storyboards/future-self-choice-storyboard.jpg";
+import futureSelfDriftImage from "../assets/storyboards/future-self-drift-storyboard.jpg";
+import futureSelfHomeImage from "../assets/storyboards/future-self-home-storyboard.jpg";
+import futureSelfLossImage from "../assets/storyboards/future-self-loss-storyboard.jpg";
+import futureSelfReclaimImage from "../assets/storyboards/future-self-reclaim-storyboard.jpg";
+import lateNightSleepChoiceImage from "../assets/storyboards/late-night-sleep-choice-storyboard.jpg";
+import lateNightSleepDriftImage from "../assets/storyboards/late-night-sleep-drift-storyboard.jpg";
+import lateNightSleepHomeImage from "../assets/storyboards/late-night-sleep-home-storyboard.jpg";
+import lateNightSleepLossImage from "../assets/storyboards/late-night-sleep-loss-storyboard.jpg";
+import lateNightSleepReclaimImage from "../assets/storyboards/late-night-sleep-reclaim-storyboard.jpg";
 import sceneLossImage from "../assets/storyboards/scene-loss-storyboard.jpg";
 import sceneReclaimImage from "../assets/storyboards/scene-reclaim-storyboard.jpg";
+import shortVideoFocusChoiceImage from "../assets/storyboards/short-video-focus-choice-storyboard.jpg";
+import shortVideoFocusDriftImage from "../assets/storyboards/short-video-focus-drift-storyboard.jpg";
+import shortVideoFocusHomeImage from "../assets/storyboards/short-video-focus-home-storyboard.jpg";
+import shortVideoFocusLossImage from "../assets/storyboards/short-video-focus-loss-storyboard.jpg";
+import shortVideoFocusReclaimImage from "../assets/storyboards/short-video-focus-reclaim-storyboard.jpg";
+import workSelfChoiceImage from "../assets/storyboards/work-self-choice-storyboard.jpg";
+import workSelfDriftImage from "../assets/storyboards/work-self-drift-storyboard.jpg";
+import workSelfHomeImage from "../assets/storyboards/work-self-home-storyboard.jpg";
+import workSelfLossImage from "../assets/storyboards/work-self-loss-storyboard.jpg";
+import workSelfReclaimImage from "../assets/storyboards/work-self-reclaim-storyboard.jpg";
 
 interface StorySceneProps {
+  storyId: string;
   scene: StorySceneData;
   onAdvance?: () => void;
+}
+
+interface SceneArtwork {
+  src: string;
+  positionClass: string;
 }
 
 function getDefaultOption(scene: StorySceneData): ReclaimOption {
@@ -25,7 +51,253 @@ function getDefaultOption(scene: StorySceneData): ReclaimOption {
   return option;
 }
 
-export function StoryScene({ scene, onAdvance }: StorySceneProps) {
+function getResearchIds(scene: StorySceneData): string[] {
+  if (!scene.researchIds) {
+    throw new Error(`Scene ${scene.id} is missing researchIds.`);
+  }
+
+  return scene.researchIds;
+}
+
+function getSceneArtwork(storyId: string, kind: Exclude<StorySceneData["kind"], "placeholder">): SceneArtwork {
+  switch (storyId) {
+    case "phone-family":
+      switch (kind) {
+        case "home":
+          return { src: sceneHomeImage, positionClass: "scene-backdrop-home" };
+        case "choice":
+          return { src: sceneChoiceImage, positionClass: "scene-backdrop-choice" };
+        case "drift":
+          return { src: sceneDriftImage, positionClass: "scene-backdrop-drift" };
+        case "loss":
+          return { src: sceneLossImage, positionClass: "scene-backdrop-loss" };
+        case "reclaim":
+          return { src: sceneReclaimImage, positionClass: "scene-backdrop-reclaim" };
+        default:
+          return assertNever(kind);
+      }
+
+    case "work-self":
+      switch (kind) {
+        case "home":
+          return { src: workSelfHomeImage, positionClass: "scene-backdrop-work-self-home" };
+        case "choice":
+          return { src: workSelfChoiceImage, positionClass: "scene-backdrop-work-self-choice" };
+        case "drift":
+          return { src: workSelfDriftImage, positionClass: "scene-backdrop-work-self-drift" };
+        case "loss":
+          return { src: workSelfLossImage, positionClass: "scene-backdrop-work-self-loss" };
+        case "reclaim":
+          return { src: workSelfReclaimImage, positionClass: "scene-backdrop-work-self-reclaim" };
+        default:
+          return assertNever(kind);
+      }
+
+    case "short-video-focus":
+      switch (kind) {
+        case "home":
+          return { src: shortVideoFocusHomeImage, positionClass: "scene-backdrop-short-video-focus-home" };
+        case "choice":
+          return { src: shortVideoFocusChoiceImage, positionClass: "scene-backdrop-short-video-focus-choice" };
+        case "drift":
+          return { src: shortVideoFocusDriftImage, positionClass: "scene-backdrop-short-video-focus-drift" };
+        case "loss":
+          return { src: shortVideoFocusLossImage, positionClass: "scene-backdrop-short-video-focus-loss" };
+        case "reclaim":
+          return {
+            src: shortVideoFocusReclaimImage,
+            positionClass: "scene-backdrop-short-video-focus-reclaim",
+          };
+        default:
+          return assertNever(kind);
+      }
+
+    case "late-night-sleep":
+      switch (kind) {
+        case "home":
+          return { src: lateNightSleepHomeImage, positionClass: "scene-backdrop-late-night-sleep-home" };
+        case "choice":
+          return { src: lateNightSleepChoiceImage, positionClass: "scene-backdrop-late-night-sleep-choice" };
+        case "drift":
+          return { src: lateNightSleepDriftImage, positionClass: "scene-backdrop-late-night-sleep-drift" };
+        case "loss":
+          return { src: lateNightSleepLossImage, positionClass: "scene-backdrop-late-night-sleep-loss" };
+        case "reclaim":
+          return {
+            src: lateNightSleepReclaimImage,
+            positionClass: "scene-backdrop-late-night-sleep-reclaim",
+          };
+        default:
+          return assertNever(kind);
+      }
+
+    case "future-self":
+      switch (kind) {
+        case "home":
+          return { src: futureSelfHomeImage, positionClass: "scene-backdrop-future-self-home" };
+        case "choice":
+          return { src: futureSelfChoiceImage, positionClass: "scene-backdrop-future-self-choice" };
+        case "drift":
+          return { src: futureSelfDriftImage, positionClass: "scene-backdrop-future-self-drift" };
+        case "loss":
+          return { src: futureSelfLossImage, positionClass: "scene-backdrop-future-self-loss" };
+        case "reclaim":
+          return {
+            src: futureSelfReclaimImage,
+            positionClass: "scene-backdrop-future-self-reclaim",
+          };
+        default:
+          return assertNever(kind);
+      }
+
+    default:
+      throw new Error(`Unhandled story artwork mapping: ${storyId}`);
+  }
+}
+
+function getChoiceClasses(storyId: string): { buttonClass: string; focusClass: string } {
+  switch (storyId) {
+    case "phone-family":
+      return {
+        buttonClass: "phone-choice",
+        focusClass: "choice-focus-ring",
+      };
+
+    case "work-self":
+      return {
+        buttonClass: "work-choice-button",
+        focusClass: "work-choice-focus-ring",
+      };
+
+    case "short-video-focus":
+      return {
+        buttonClass: "focus-choice-button",
+        focusClass: "focus-choice-ring",
+      };
+
+    case "late-night-sleep":
+      return {
+        buttonClass: "sleep-choice-button",
+        focusClass: "sleep-choice-ring",
+      };
+
+    case "future-self":
+      return {
+        buttonClass: "growth-choice-button",
+        focusClass: "growth-choice-ring",
+      };
+
+    default:
+      throw new Error(`Unhandled choice scene mapping: ${storyId}`);
+  }
+}
+
+function getRequiredActionLabel(scene: StorySceneData): string {
+  if (!scene.actionLabel) {
+    throw new Error(`Scene ${scene.id} is missing an actionLabel.`);
+  }
+
+  return scene.actionLabel;
+}
+
+function HomeOverlay({ storyId }: { storyId: string }) {
+  switch (storyId) {
+    case "phone-family":
+      return (
+        <>
+          <motion.div
+            className="room-glow"
+            animate={{ opacity: [0.8, 1, 0.84] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="door-warmth"
+            animate={{ opacity: [0.85, 1, 0.88], scale: [1, 1.02, 1] }}
+            transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="steam-cloud steam-cloud-a"
+            animate={{ y: [0, -10, 0], opacity: [0.35, 0.75, 0.35] }}
+            transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="steam-cloud steam-cloud-b"
+            animate={{ y: [0, -12, 0], opacity: [0.28, 0.6, 0.28] }}
+            transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+          />
+        </>
+      );
+
+    case "work-self":
+      return (
+        <>
+          <motion.div
+            className="office-night-glow"
+            animate={{ opacity: [0.72, 1, 0.78] }}
+            transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="office-screen-glow"
+            animate={{ opacity: [0.32, 0.72, 0.4], scale: [0.98, 1.04, 1] }}
+            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      );
+
+    case "short-video-focus":
+      return (
+        <>
+          <motion.div
+            className="focus-room-glow"
+            animate={{ opacity: [0.76, 1, 0.8] }}
+            transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="focus-lamp-glow"
+            animate={{ opacity: [0.28, 0.6, 0.34], scale: [0.98, 1.03, 1] }}
+            transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      );
+
+    case "late-night-sleep":
+      return (
+        <>
+          <motion.div
+            className="sleep-room-glow"
+            animate={{ opacity: [0.78, 1, 0.82] }}
+            transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="sleep-lamp-glow"
+            animate={{ opacity: [0.26, 0.56, 0.3], scale: [0.98, 1.02, 1] }}
+            transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      );
+
+    case "future-self":
+      return (
+        <>
+          <motion.div
+            className="growth-room-glow"
+            animate={{ opacity: [0.76, 1, 0.82] }}
+            transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="growth-desk-glow"
+            animate={{ opacity: [0.26, 0.58, 0.32], scale: [0.98, 1.03, 1] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      );
+
+    default:
+      throw new Error(`Unhandled home overlay: ${storyId}`);
+  }
+}
+
+export function StoryScene({ storyId, scene, onAdvance }: StorySceneProps) {
   const [selectedMinutes, setSelectedMinutes] = useState<15 | 30 | 45>(30);
 
   useEffect(() => {
@@ -39,32 +311,15 @@ export function StoryScene({ scene, onAdvance }: StorySceneProps) {
       : null;
 
   switch (scene.kind) {
-    case "home":
+    case "home": {
+      const artwork = getSceneArtwork(storyId, "home");
+
       return (
         <article className="story-scene story-scene-home">
           <SceneText scene={scene} />
           <div className="scene-visual home-visual" aria-hidden="true">
-            <SceneBackdrop src={sceneHomeImage} alt="" positionClass="scene-backdrop-home" />
-            <motion.div
-              className="room-glow"
-              animate={{ opacity: [0.8, 1, 0.84] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="door-warmth"
-              animate={{ opacity: [0.85, 1, 0.88], scale: [1, 1.02, 1] }}
-              transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="steam-cloud steam-cloud-a"
-              animate={{ y: [0, -10, 0], opacity: [0.35, 0.75, 0.35] }}
-              transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="steam-cloud steam-cloud-b"
-              animate={{ y: [0, -12, 0], opacity: [0.28, 0.6, 0.28] }}
-              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-            />
+            <SceneBackdrop src={artwork.src} alt="" positionClass={artwork.positionClass} />
+            <HomeOverlay storyId={storyId} />
           </div>
           {scene.actionLabel ? (
             <button className="scene-action click-target" type="button" onClick={onAdvance}>
@@ -74,22 +329,27 @@ export function StoryScene({ scene, onAdvance }: StorySceneProps) {
           ) : null}
         </article>
       );
+    }
 
-    case "choice":
+    case "choice": {
+      const artwork = getSceneArtwork(storyId, "choice");
+      const choiceClasses = getChoiceClasses(storyId);
+      const choiceLabel = getRequiredActionLabel(scene);
+
       return (
         <article className="story-scene story-scene-choice">
           <SceneText scene={scene} />
           <div className="scene-visual choice-visual">
-            <SceneBackdrop src={sceneChoiceImage} alt="" positionClass="scene-backdrop-choice" />
+            <SceneBackdrop src={artwork.src} alt="" positionClass={artwork.positionClass} />
             <motion.div
-              className="choice-focus-ring"
+              className={choiceClasses.focusClass}
               animate={{ scale: [0.94, 1.08, 0.94], opacity: [0.36, 0.9, 0.36] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.button
-              className="phone-choice click-target"
+              className={`${choiceClasses.buttonClass} click-target`}
               type="button"
-              aria-label={scene.actionLabel}
+              aria-label={choiceLabel}
               onClick={onAdvance}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.98 }}
@@ -108,19 +368,22 @@ export function StoryScene({ scene, onAdvance }: StorySceneProps) {
                 animate={{ opacity: [0.8, 1, 0.82] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
               />
-              <span className="phone-choice-copy">{scene.actionLabel}</span>
+              <span className="phone-choice-copy">{choiceLabel}</span>
               <span className="click-pulse click-pulse-cold" aria-hidden="true" />
             </motion.button>
           </div>
         </article>
       );
+    }
 
-    case "drift":
+    case "drift": {
+      const artwork = getSceneArtwork(storyId, "drift");
+
       return (
         <article className="story-scene story-scene-drift">
           <SceneText scene={scene} />
           <div className="scene-visual drift-visual" aria-hidden="true">
-            <SceneBackdrop src={sceneDriftImage} alt="" positionClass="scene-backdrop-drift" />
+            <SceneBackdrop src={artwork.src} alt="" positionClass={artwork.positionClass} />
             <motion.div
               className="drift-vortex"
               animate={{ scale: [0.96, 1.08, 0.96], opacity: [0.85, 1, 0.85] }}
@@ -160,13 +423,16 @@ export function StoryScene({ scene, onAdvance }: StorySceneProps) {
           ) : null}
         </article>
       );
+    }
 
-    case "loss":
+    case "loss": {
+      const artwork = getSceneArtwork(storyId, "loss");
+
       return (
         <article className="story-scene story-scene-loss">
           <SceneText scene={scene} />
           <div className="scene-visual loss-visual" aria-hidden="true">
-            <SceneBackdrop src={sceneLossImage} alt="" positionClass="scene-backdrop-loss" />
+            <SceneBackdrop src={artwork.src} alt="" positionClass={artwork.positionClass} />
             <div className="loss-dust">
               {Array.from({ length: 8 }).map((_, index) => (
                 <motion.span
@@ -191,9 +457,16 @@ export function StoryScene({ scene, onAdvance }: StorySceneProps) {
           ) : null}
         </article>
       );
+    }
 
     case "reclaim": {
-      const references = getResearchReferences(scene.researchIds ?? []);
+      const nowArtwork = getSceneArtwork(storyId, "loss");
+      const futureArtwork = getSceneArtwork(storyId, "reclaim");
+      const references = getResearchReferences(getResearchIds(scene));
+
+      if (!selectedOption) {
+        throw new Error(`Scene ${scene.id} is missing a reclaim option for ${selectedMinutes} minutes.`);
+      }
 
       return (
         <article className="story-scene story-scene-reclaim">
@@ -206,10 +479,10 @@ export function StoryScene({ scene, onAdvance }: StorySceneProps) {
               transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
             >
               <SceneBackdrop
-                src={sceneLossImage}
+                src={nowArtwork.src}
                 alt=""
                 className="scene-backdrop-contained"
-                positionClass="scene-backdrop-loss"
+                positionClass={nowArtwork.positionClass}
               />
               <span className="world-label">现在</span>
               <div className="world-room world-room-cold" />
@@ -244,24 +517,17 @@ export function StoryScene({ scene, onAdvance }: StorySceneProps) {
                   setSelectedMinutes(nextValue);
                 }}
               />
-              <p className="reclaim-line">{selectedOption?.line}</p>
+              <p className="reclaim-line">{selectedOption.line}</p>
               <span className="click-pulse click-pulse-warm" aria-hidden="true" />
               <div className="result-grid">
-                <ResultPill
-                  label="一年多出"
-                  value={selectedOption?.yearlyHours ?? 0}
-                  unit="小时"
-                />
-                <ResultPill
-                  label="来得及的晚饭"
-                  value={selectedOption?.dinners ?? 0}
-                  unit="次"
-                />
-                <ResultPill
-                  label="安静陪伴"
-                  value={selectedOption?.presence ?? 0}
-                  unit="段"
-                />
+                {selectedOption.metrics.map((metric) => (
+                  <ResultPill
+                    key={`${scene.id}-${selectedMinutes}-${metric.label}`}
+                    label={metric.label}
+                    value={metric.value}
+                    unit={metric.unit}
+                  />
+                ))}
               </div>
             </motion.div>
 
@@ -278,10 +544,10 @@ export function StoryScene({ scene, onAdvance }: StorySceneProps) {
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
               <SceneBackdrop
-                src={sceneReclaimImage}
+                src={futureArtwork.src}
                 alt=""
                 className="scene-backdrop-contained"
-                positionClass="scene-backdrop-reclaim"
+                positionClass={futureArtwork.positionClass}
               />
               <span className="world-label">拿回后</span>
               <div className="world-room world-room-warm" />

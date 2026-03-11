@@ -27,9 +27,11 @@ export function StoryGallery() {
     return story;
   }, [selectedStoryId]);
 
-  useEffect(() => {
-    setActiveSceneIndex(0);
-  }, [selectedStoryId]);
+  const currentScene = selectedStory.scenes[activeSceneIndex];
+
+  if (!currentScene) {
+    throw new Error(`Missing scene at index ${activeSceneIndex} for story ${selectedStory.id}`);
+  }
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -71,7 +73,11 @@ export function StoryGallery() {
             key={story.id}
             story={story}
             isActive={story.id === selectedStory.id}
-            onSelect={() => setSelectedStoryId(story.id)}
+            onSelect={() => {
+              setDirection(1);
+              setSelectedStoryId(story.id);
+              setActiveSceneIndex(0);
+            }}
           />
         ))}
       </section>
@@ -79,7 +85,7 @@ export function StoryGallery() {
       <section className="gallery-stage">
         <AnimatePresence initial={false} mode="wait" custom={direction}>
           <motion.div
-            key={selectedStory.scenes[activeSceneIndex]?.id}
+            key={`${selectedStory.id}:${currentScene.id}`}
             className="scene-page"
             custom={direction}
             initial={{ opacity: 0, x: direction > 0 ? 120 : -120, scale: 0.98 }}
@@ -90,7 +96,8 @@ export function StoryGallery() {
             {selectedStory.scenes.map((scene, index) =>
               index === activeSceneIndex ? (
                 <StoryScene
-                  key={scene.id}
+                  key={`${selectedStory.id}:${scene.id}`}
+                  storyId={selectedStory.id}
                   scene={scene}
                   onAdvance={
                     index < selectedStory.scenes.length - 1

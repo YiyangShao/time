@@ -51,23 +51,29 @@ export const phoneFamilyStory: StoryDefinition = {
         {
           minutes: 15,
           line: "今晚，至少没有再把那句“吃饭吧”留在空气里。",
-          yearlyHours: 91,
-          dinners: 46,
-          presence: 110,
+          metrics: [
+            { label: "一年多出", value: 91, unit: "小时" },
+            { label: "来得及的晚饭", value: 46, unit: "次" },
+            { label: "安静陪伴", value: 110, unit: "段" },
+          ],
         },
         {
           minutes: 30,
           line: "今晚，多了一次来得及坐下来的晚饭，也多了一次把那张画看完的时间。",
-          yearlyHours: 182,
-          dinners: 91,
-          presence: 218,
+          metrics: [
+            { label: "一年多出", value: 182, unit: "小时" },
+            { label: "来得及的晚饭", value: 91, unit: "次" },
+            { label: "安静陪伴", value: 218, unit: "段" },
+          ],
         },
         {
           minutes: 45,
           line: "今晚，不只是放下手机，而是真的回到了他们身边。",
-          yearlyHours: 274,
-          dinners: 137,
-          presence: 329,
+          metrics: [
+            { label: "一年多出", value: 274, unit: "小时" },
+            { label: "来得及的晚饭", value: 137, unit: "次" },
+            { label: "安静陪伴", value: 329, unit: "段" },
+          ],
         },
       ],
     },

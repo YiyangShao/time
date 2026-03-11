@@ -20,12 +20,16 @@ export interface ResearchReference {
   recommendedForUi: boolean;
 }
 
+export interface ReclaimMetric {
+  label: string;
+  value: number;
+  unit: string;
+}
+
 export interface ReclaimOption {
   minutes: 15 | 30 | 45;
   line: string;
-  yearlyHours: number;
-  dinners: number;
-  presence: number;
+  metrics: ReclaimMetric[];
 }
 
 export interface StoryScene {
