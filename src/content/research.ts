@@ -25,6 +25,18 @@ export const researchReferences: Record<string, ResearchReference> = {
     displayValue: "178.2 小时 / 月",
     recommendedForUi: true,
   },
+  cnInternetUse2024: {
+    id: "cnInternetUse2024",
+    label: "居民每日互联网使用平均时间",
+    source: "国家统计局 / 第三次全国时间利用调查公报",
+    summary: "国家统计局调查显示，我国居民每日使用互联网平均时间达到 5 小时 37 分钟。",
+    methodology:
+      "口径是居民每日互联网使用平均时间，覆盖更广泛的上网活动，适合用来呈现数字注意力被占据的总体强度。",
+    year: "2024",
+    url: "https://www.stats.gov.cn/zwfwck/sjfb/202410/t20241031_1957215.html",
+    displayValue: "5 小时 37 分 / 天",
+    recommendedForUi: true,
+  },
   cnWorkHours2025: {
     id: "cnWorkHours2025",
     label: "全国企业就业人员周平均工作时间",

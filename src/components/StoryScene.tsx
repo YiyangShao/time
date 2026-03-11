@@ -34,6 +34,8 @@ interface StorySceneProps {
   storyId: string;
   scene: StorySceneData;
   onAdvance?: () => void;
+  onNextStory?: () => void;
+  nextStoryTitle?: string;
 }
 
 interface SceneArtwork {
@@ -297,7 +299,7 @@ function HomeOverlay({ storyId }: { storyId: string }) {
   }
 }
 
-export function StoryScene({ storyId, scene, onAdvance }: StorySceneProps) {
+export function StoryScene({ storyId, scene, onAdvance, onNextStory, nextStoryTitle }: StorySceneProps) {
   const [selectedMinutes, setSelectedMinutes] = useState<15 | 30 | 45>(30);
 
   useEffect(() => {
@@ -588,6 +590,15 @@ export function StoryScene({ storyId, scene, onAdvance }: StorySceneProps) {
               </motion.article>
             ))}
           </section>
+
+          {onNextStory && nextStoryTitle ? (
+            <section className="story-end-actions" aria-label="继续看下一个展">
+              <button className="story-next-button click-target" type="button" onClick={onNextStory}>
+                下一展：{nextStoryTitle}
+                <span className="click-pulse click-pulse-warm" aria-hidden="true" />
+              </button>
+            </section>
+          ) : null}
         </article>
       );
     }
@@ -642,7 +653,6 @@ function SceneText({ scene }: { scene: StorySceneData }) {
       <p className="scene-kicker">{scene.kicker}</p>
       <h2>{scene.title}</h2>
       {scene.line ? <p className="scene-line">{scene.line}</p> : null}
-      {scene.actionHint ? <p className="scene-hint">{scene.actionHint}</p> : null}
     </motion.header>
   );
 }

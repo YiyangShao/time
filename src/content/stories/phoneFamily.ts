@@ -46,7 +46,7 @@ export const phoneFamilyStory: StoryDefinition = {
       title: "生活不会一下子改变。",
       line: "但它会从你重新看向他们的那一刻，慢慢回来。",
       kind: "reclaim",
-      researchIds: ["cnReading2024", "questMobile2025"],
+      researchIds: ["questMobile2025", "cnInternetUse2024"],
       reclaimOptions: [
         {
           minutes: 15,
